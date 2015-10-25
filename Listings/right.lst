@@ -1,0 +1,212 @@
+C51 COMPILER V9.54   RIGHT                                                                 10/25/2015 21:30:28 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE RIGHT
+OBJECT MODULE PLACED IN .\Objects\right.obj
+COMPILER INVOKED BY: D:\Keil_MDK\C51\BIN\C51.EXE right.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\ri
+                    -ght.lst) OBJECT(.\Objects\right.obj)
+
+line level    source
+
+   1          #include <reg51.h>
+   2          
+   3          sbit LEFT1 = P0^2;
+   4          sbit LEFT2 = P0^3;
+   5          sbit RIGHT1 = P0^0;
+   6          sbit RIGHT2 = P0^1;
+   7          
+   8          sbit BUZZ = P1^0;
+   9          sbit LIGHT_LEFT = P1^1;
+  10          sbit LIGHT_RIGHT = P1^2;
+  11          sbit LIGHT = P1^3;
+  12          
+  13          #define PWM_LEFT 35             // 越大，越快
+  14          #define PWM_RIGHT 35    // 越大，越快
+  15          #define PWM 25                  // 越大，越慢
+  16          
+  17          unsigned char Temp = 0;
+  18          
+  19          void ConfigUART(unsigned int baud)              
+  20          {
+  21   1              SCON = 0X50;
+  22   1              TMOD &= 0X0F;
+  23   1              TMOD |= 0X20;           // 模式2 , TL溢出, TH填充
+  24   1              TH1 = 256 - (11059200 / 12 / 32) / baud;
+  25   1              TL1 = TH1;
+  26   1              ET1 = 0;        // 禁止T1中断
+  27   1              ES = 1;
+  28   1              TR1 = 1;
+  29   1      }
+  30          
+  31          
+  32          void Delay(unsigned char x)
+  33          {
+  34   1              unsigned char i;
+  35   1              unsigned char j;
+  36   1              for(i = 5; i > 0; i--)
+  37   1              {
+  38   2                      for(j = x; j > 0; j--)
+  39   2                      {
+  40   3                              ;
+  41   3                      }
+  42   2              }
+  43   1              
+  44   1      }
+  45          
+  46          void Go()
+  47          {
+  48   1              LEFT1 = 0;
+  49   1              LEFT2 = 1;
+  50   1              Delay(PWM_LEFT);
+  51   1              LEFT1 = 1;
+  52   1              LEFT2 = 1;
+  53   1              
+  54   1              RIGHT1 = 0;
+C51 COMPILER V9.54   RIGHT                                                                 10/25/2015 21:30:28 PAGE 2   
+
+  55   1              RIGHT2 = 1;
+  56   1              Delay(PWM_RIGHT);
+  57   1              RIGHT1 = 1;
+  58   1              RIGHT2 = 1;
+  59   1              
+  60   1              /*
+  61   1              LEFT1 = 1;
+  62   1              LEFT2 = 1;
+  63   1              RIGHT1 = 1;
+  64   1              RIGHT2 = 1;
+  65   1              */
+  66   1              
+  67   1              Delay(PWM);
+  68   1      }
+  69          
+  70          void Back()
+  71          {
+  72   1              LEFT1 = 1;
+  73   1              LEFT2 = 0;
+  74   1              Delay(PWM_LEFT);
+  75   1              LEFT1 = 1;
+  76   1              LEFT2 = 1;
+  77   1              
+  78   1              RIGHT1 = 1;
+  79   1              RIGHT2 = 0;
+  80   1              Delay(PWM_RIGHT);
+  81   1              RIGHT1 = 1;
+  82   1              RIGHT2 = 1;
+  83   1              
+  84   1              Delay(PWM);
+  85   1      }
+  86          
+  87          void Left()
+  88          {
+  89   1              LEFT1 = 1;
+  90   1              LEFT2 = 0;
+  91   1              Delay(PWM_LEFT);
+  92   1              LEFT1 = 1;
+  93   1              LEFT2 = 1;
+  94   1              
+  95   1              RIGHT1 = 0;
+  96   1              RIGHT2 = 1;
+  97   1              Delay(PWM_RIGHT);
+  98   1              RIGHT1 = 1;
+  99   1              RIGHT2 = 1;
+ 100   1              
+ 101   1              Delay(PWM);
+ 102   1              
+ 103   1              LEFT1 = 1;
+ 104   1              LEFT2 = 1;
+ 105   1              RIGHT1 = 1;
+ 106   1              RIGHT2 = 1;
+ 107   1              
+ 108   1              Delay(PWM);
+ 109   1      }
+ 110          
+ 111          void Right()
+ 112          {
+ 113   1              LEFT1 = 0;
+ 114   1              LEFT2 = 1;
+ 115   1              Delay(PWM_LEFT);
+ 116   1              LEFT1 = 1;
+C51 COMPILER V9.54   RIGHT                                                                 10/25/2015 21:30:28 PAGE 3   
+
+ 117   1              LEFT2 = 1;
+ 118   1              
+ 119   1              RIGHT1 = 1;
+ 120   1              RIGHT2 = 0;
+ 121   1              Delay(PWM_RIGHT);
+ 122   1              RIGHT1 = 1;
+ 123   1              RIGHT2 = 1;
+ 124   1      
+ 125   1              Delay(PWM);
+ 126   1      }
+ 127          
+ 128          void Down()
+ 129          {
+ 130   1              LEFT1 = 1;
+ 131   1              LEFT2 = 1;
+ 132   1              RIGHT1 = 1;
+ 133   1              RIGHT2 = 1;
+ 134   1              
+ 135   1              LIGHT_LEFT = 1;
+ 136   1              LIGHT_RIGHT = 1;
+ 137   1      }
+ 138          
+ 139          main()
+ 140          {
+ 141   1              EA = 1;
+ 142   1              ConfigUART(9600);
+ 143   1              
+ 144   1              LEFT1 = 1;
+ 145   1              LEFT2 = 1;
+ 146   1              RIGHT1 = 1;
+ 147   1              RIGHT2 = 1;
+ 148   1              
+ 149   1              while(1)
+ 150   1              {
+ 151   2                      switch(Temp)
+ 152   2                      {
+ 153   3                              case 0x1F:
+ 154   3                                      Go();           break;
+ 155   3                              case 0x2F:
+ 156   3                                      Back();         break;
+ 157   3                              case 0x3F:
+ 158   3                                      Left(); LIGHT_LEFT = 0;         break;
+ 159   3                              case 0x4F:
+ 160   3                                      Right(); LIGHT_RIGHT = 0;       break;
+ 161   3                              case 0x00:
+ 162   3                                      Down();         break;
+ 163   3                              
+ 164   3                              case 0xA0:
+ 165   3                                      LIGHT = 0;      break;
+ 166   3                              case 0xB0:
+ 167   3                                      LIGHT = 1;      break;
+ 168   3                              case 0xC0:
+ 169   3                                      BUZZ = 0;       break;
+ 170   3                              case 0xD0:
+ 171   3                                      BUZZ = 1;       break;
+ 172   3                                      
+ 173   3                      }
+ 174   2                      Down();
+ 175   2              }
+ 176   1      }
+ 177          
+ 178          void UART() interrupt 4 
+C51 COMPILER V9.54   RIGHT                                                                 10/25/2015 21:30:28 PAGE 4   
+
+ 179          {
+ 180   1              RI = 0;
+ 181   1              Temp = SBUF;
+ 182   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    290    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      1    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
